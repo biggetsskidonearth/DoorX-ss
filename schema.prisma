@@ -1,0 +1,112 @@
+// ─────────────────────────────────────────────────────────────────────────────
+// DoorX Database Schema — Prisma + PostgreSQL (Vercel Postgres / Neon)
+// Deploy: npx prisma db push  or  npx prisma migrate deploy
+// ─────────────────────────────────────────────────────────────────────────────
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // Required for Vercel Postgres (pooled vs direct)
+}
+
+// ── KEYS ─────────────────────────────────────────────────────────────────────
+// One key record per verified user per plan.
+// robloxUserId is the primary natural key — one key per Roblox account per plan.
+
+model Key {
+  id            String   @id @default(cuid())
+  key           String   @unique                // DoorX-{Plan}-XXXXXXXXXXX
+  plan          Plan
+  robloxUserId  BigInt                           // Roblox numeric user ID
+  robloxName    String                           // Username at time of generation
+  ipHash        String?                          // SHA-256 of IP (never raw IP)
+  hwid          String?                          // HWID token (from program)
+  sessionSig    String                           // Session signature used at generation
+  isActive      Boolean  @default(true)
+  isRevoked     Boolean  @default(false)
+  revokeReason  String?
+  expiresAt     DateTime?                        // null = lifetime, set for Free Trial
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  lastUsedAt    DateTime?
+  useCount      Int      @default(0)
+
+  auditLogs     AuditLog[]
+
+  @@unique([robloxUserId, plan])                 // One key per Roblox account per plan
+  @@index([key])
+  @@index([robloxUserId])
+  @@index([plan])
+  @@index([createdAt])
+}
+
+// ── AUDIT LOG ─────────────────────────────────────────────────────────────────
+// Immutable log of every key action. Used for security investigations.
+
+model AuditLog {
+  id          String      @id @default(cuid())
+  keyId       String?
+  key         Key?        @relation(fields: [keyId], references: [id], onDelete: SetNull)
+  action      AuditAction
+  ipHash      String?
+  userAgent   String?
+  origin      String?
+  detail      String?     // JSON string with extra context
+  createdAt   DateTime    @default(now())
+
+  @@index([keyId])
+  @@index([action])
+  @@index([createdAt])
+}
+
+// ── LOCKDOWN SESSIONS ─────────────────────────────────────────────────────────
+// Tracks IP addresses or session IDs that have been locked down.
+
+model Lockdown {
+  id          String   @id @default(cuid())
+  ipHash      String
+  reason      String
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@unique([ipHash])
+  @@index([expiresAt])
+}
+
+// ── RATE LIMIT CACHE ──────────────────────────────────────────────────────────
+// Server-side rate limiting (complements client-side RL).
+
+model RateLimit {
+  id          String   @id @default(cuid())
+  identifier  String   @unique              // ipHash:action
+  count       Int      @default(1)
+  windowStart DateTime @default(now())
+  expiresAt   DateTime
+
+  @@index([identifier])
+  @@index([expiresAt])
+}
+
+// ── ENUMS ─────────────────────────────────────────────────────────────────────
+
+enum Plan {
+  Free
+  Normal
+  Premium
+}
+
+enum AuditAction {
+  KEY_GENERATED
+  KEY_VALIDATED
+  KEY_REVOKED
+  KEY_EXPIRED
+  LOCKDOWN_TRIGGERED
+  GAMEPASS_VERIFIED
+  GAMEPASS_FAILED
+  RATE_LIMITED
+  UNAUTHORIZED_FETCH
+}
