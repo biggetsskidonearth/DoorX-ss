@@ -1,0 +1,1786 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="DoorX — Elite Roblox Serverside. Undetected. Lightning fast.">
+<title>DoorX • Elite Serverside</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+
+:root {
+  --bg:#060608; --s1:#0d0d12; --s2:#111118; --s3:#16161e;
+  --b1:rgba(255,255,255,0.06); --b2:rgba(255,255,255,0.11); --b3:rgba(255,255,255,0.18);
+  --red:#e63950; --red2:#ff7091; --red-g:rgba(230,57,80,0.28);
+  --green:#00f5a0; --green-g:rgba(0,245,160,0.25);
+  --gold:#ffc14a; --gold-g:rgba(255,193,74,0.28);
+  --txt:#eeeef2; --m:#8888a0; --dim:#3a3a50;
+  --dsp:'Bebas Neue',sans-serif; --body:'DM Sans',sans-serif; --mono:'JetBrains Mono',monospace;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--body);min-height:100vh;overflow-x:hidden;-webkit-font-smoothing:antialiased}
+
+/* BACKGROUND */
+.bg{position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 65% 55% at 8% 12%,rgba(230,57,80,.13) 0%,transparent 55%),
+             radial-gradient(ellipse 50% 45% at 92% 88%,rgba(255,112,145,.08) 0%,transparent 55%),
+             radial-gradient(ellipse 35% 40% at 55% 50%,rgba(0,245,160,.025) 0%,transparent 50%)}
+#cv{position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.65}
+
+/* TOPBAR */
+.tb{position:sticky;top:0;z-index:1000;display:flex;align-items:center;justify-content:space-between;
+  padding:13px 6%;background:rgba(6,6,8,.93);backdrop-filter:blur(40px);
+  border-bottom:1px solid var(--b1)}
+.logo{display:flex;align-items:center;gap:11px;cursor:pointer;text-decoration:none}
+.logo-img{width:42px;height:42px;border-radius:11px;object-fit:cover;
+  box-shadow:0 0 16px rgba(255,210,0,.55),0 0 30px rgba(255,165,0,.2);
+  animation:spin-slow 18s linear infinite;flex-shrink:0;
+  transition:box-shadow .3s}
+.logo:hover .logo-img{box-shadow:0 0 24px rgba(255,210,0,.8),0 0 44px rgba(255,165,0,.4)}
+@keyframes spin-slow{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+.logo-txt{font-family:var(--dsp);font-size:1.85rem;letter-spacing:5px;
+  background:linear-gradient(135deg,#fff 20%,var(--red2) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.nav{display:flex;gap:2px;background:rgba(255,255,255,0.03);padding:4px;border-radius:13px;border:1px solid var(--b1)}
+.nb{padding:9px 20px;border:none;border-radius:10px;background:transparent;color:var(--m);
+  font-family:var(--body);font-weight:600;font-size:.88rem;cursor:pointer;transition:all .22s}
+.nb:hover{color:var(--txt);background:rgba(255,255,255,.05)}
+.nb.on{background:var(--red);color:#fff;box-shadow:0 0 16px var(--red-g)}
+.nb.free-on{background:var(--green);color:#000;font-weight:800;box-shadow:0 0 16px var(--green-g)}
+
+/* UNDETECTED BAR */
+.ubar{position:sticky;top:67px;z-index:999;
+  background:rgba(6,6,8,.9);backdrop-filter:blur(30px);
+  border-bottom:1px solid var(--b1);
+  display:flex;justify-content:center;align-items:center;padding:10px;gap:16px}
+.und-chip{display:flex;align-items:center;gap:8px;
+  background:rgba(0,245,160,.07);border:1px solid rgba(0,245,160,.2);
+  padding:7px 22px;border-radius:9999px;font-weight:800;font-size:.82rem;
+  letter-spacing:3px;color:var(--green);text-transform:uppercase}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(--green);
+  box-shadow:0 0 7px var(--green);animation:blink 2s ease infinite}
+@keyframes blink{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(.8)}}
+
+/* BANNER */
+.bnr{position:sticky;top:113px;z-index:998;
+  background:linear-gradient(90deg,var(--red),var(--gold),var(--red));
+  background-size:300% 100%;animation:bflow 5s ease infinite;
+  padding:8px;text-align:center;font-weight:700;font-size:.86rem;color:#fff;letter-spacing:.3px}
+@keyframes bflow{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+
+/* MAIN */
+.main{position:relative;z-index:2;padding:0 6% 80px;max-width:1080px;margin:0 auto}
+.tab{display:none}
+.tab.show{display:block;animation:fadein .38s cubic-bezier(.4,0,.2,1)}
+@keyframes fadein{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+
+/* HERO */
+.hero{text-align:center;padding:75px 0 65px}
+.hero-chip{display:inline-flex;align-items:center;gap:7px;
+  background:rgba(230,57,80,.1);border:1px solid rgba(230,57,80,.2);
+  padding:7px 18px;border-radius:9999px;font-size:.8rem;font-weight:600;
+  color:var(--red2);margin-bottom:28px;letter-spacing:.4px}
+.hero h1{font-family:var(--dsp);font-size:7.8rem;line-height:.9;letter-spacing:2px;
+  background:linear-gradient(150deg,#fff 0%,#fff 50%,var(--red2) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:24px}
+.hero p{font-size:1.12rem;color:var(--m);max-width:460px;margin:0 auto 40px;line-height:1.75}
+.hbtns{display:flex;gap:11px;justify-content:center;flex-wrap:wrap}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:8px;padding:13px 32px;border-radius:11px;
+  border:none;font-family:var(--body);font-weight:700;font-size:.93rem;cursor:pointer;
+  transition:all .26s cubic-bezier(.4,0,.2,1);text-decoration:none;white-space:nowrap}
+.btn:disabled{opacity:.5;cursor:not-allowed}
+.btn-p{background:var(--red);color:#fff;box-shadow:0 0 20px var(--red-g)}
+.btn-p:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 0 36px var(--red-g),0 14px 26px rgba(0,0,0,.3)}
+.btn-g{background:rgba(255,255,255,.05);color:var(--txt);border:1px solid var(--b2)}
+.btn-g:hover:not(:disabled){background:rgba(255,255,255,.09);transform:translateY(-2px)}
+.btn-f{background:var(--green);color:#000;font-weight:800;box-shadow:0 0 20px var(--green-g)}
+.btn-f:hover:not(:disabled){transform:translateY(-3px);box-shadow:0 0 36px var(--green-g)}
+.btn-full{width:100%;justify-content:center;padding:16px;font-size:1rem;border-radius:13px;margin-top:14px}
+
+/* BADGES */
+.badges{display:flex;justify-content:center;gap:9px;flex-wrap:wrap;margin:44px 0}
+.bdg{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,.03);
+  border:1px solid var(--b1);padding:7px 15px;border-radius:9999px;
+  font-size:.8rem;font-weight:600;color:var(--m)}
+
+/* SECTION HEADERS */
+.sh{text-align:center;margin:78px 0 40px}
+.sl{font-size:.72rem;font-weight:700;letter-spacing:3.5px;color:var(--red);
+  text-transform:uppercase;margin-bottom:11px}
+.st{font-family:var(--dsp);font-size:3.1rem;letter-spacing:2px;
+  background:linear-gradient(135deg,#fff,rgba(255,255,255,.45));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent}
+
+/* STEPS */
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.step{background:var(--s1);border:1px solid var(--b1);border-radius:26px;padding:34px 26px;
+  text-align:center;transition:all .32s;position:relative;overflow:hidden}
+.step::before{content:'';position:absolute;inset:0;border-radius:inherit;
+  background:linear-gradient(135deg,rgba(230,57,80,.06),transparent);opacity:0;transition:opacity .3s}
+.step:hover{border-color:rgba(230,57,80,.22);transform:translateY(-7px);box-shadow:0 22px 44px rgba(0,0,0,.4)}
+.step:hover::before{opacity:1}
+.sn{font-family:var(--dsp);font-size:4.8rem;line-height:1;color:rgba(230,57,80,.14);
+  margin-bottom:13px;transition:color .3s}
+.step:hover .sn{color:rgba(230,57,80,.38)}
+.step h3{font-size:1.05rem;font-weight:700;margin-bottom:7px}
+.step p{color:var(--m);font-size:.88rem;line-height:1.65}
+
+/* WHY */
+.why{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+.wc{background:var(--s1);border:1px solid var(--b1);border-radius:24px;
+  padding:26px;display:flex;gap:16px;align-items:flex-start;transition:all .3s}
+.wc:hover{border-color:rgba(230,57,80,.18);transform:translateY(-4px);box-shadow:0 18px 34px rgba(0,0,0,.35)}
+.wi{font-size:1.6rem;width:50px;height:50px;flex-shrink:0;
+  background:rgba(230,57,80,.07);border-radius:13px;
+  display:flex;align-items:center;justify-content:center}
+.wc h3{font-size:1.02rem;font-weight:700;margin-bottom:6px}
+.wc p{color:var(--m);font-size:.88rem;line-height:1.6}
+
+/* TABLE */
+.tw{border-radius:24px;overflow:hidden;border:1px solid var(--b1)}
+.ct{width:100%;border-collapse:collapse;background:var(--s1)}
+.ct th{padding:17px 15px;font-weight:700;font-size:.92rem;
+  background:rgba(255,255,255,.04);color:var(--txt);border-bottom:1px solid var(--b1)}
+.ct th:first-child{text-align:left;padding-left:26px}
+.ct td{padding:15px;text-align:center;border-bottom:1px solid var(--b1);color:var(--m);font-size:.88rem}
+.ct td:first-child{text-align:left;padding-left:26px;color:var(--txt);font-weight:500}
+.ct tr:last-child td{border-bottom:none}
+.yes{color:var(--green)!important}
+.no{color:var(--dim)!important}
+
+/* GAMES */
+.gg{display:grid;grid-template-columns:repeat(auto-fill,minmax(125px,1fr));gap:11px}
+.gc{background:var(--s1);border:1px solid var(--b1);border-radius:15px;
+  padding:19px 12px;text-align:center;transition:all .27s;
+  text-decoration:none;color:var(--txt);display:block;position:relative}
+.gc:hover{border-color:var(--red);transform:scale(1.06);box-shadow:0 0 18px var(--red-g)}
+.gc .ge{font-size:1.9rem;display:block;margin-bottom:7px}
+.gc .gn{font-size:.78rem;font-weight:600;color:var(--m);line-height:1.3}
+.gc.tg{border-color:var(--green);box-shadow:0 0 14px var(--green-g)}
+.gc.tg::after{content:'TEST';position:absolute;top:6px;right:6px;background:var(--green);
+  color:#000;font-size:.58rem;font-weight:800;padding:2px 6px;border-radius:9999px;letter-spacing:.8px}
+
+/* TESTIMONIALS */
+.tms{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+.tc{background:var(--s1);border:1px solid var(--b1);border-radius:22px;padding:26px;transition:border-color .3s}
+.tc:hover{border-color:rgba(230,57,80,.15)}
+.tc-t{color:var(--m);font-size:.88rem;line-height:1.7;margin-bottom:14px;font-style:italic}
+.tc-a{color:var(--red2);font-weight:700;font-size:.84rem}
+
+/* ACTIVITY */
+.act{background:var(--s1);border:1px solid var(--b1);border-radius:22px;overflow:hidden}
+.act-hd{padding:13px 20px;border-bottom:1px solid var(--b1);
+  font-size:.83rem;font-weight:700;display:flex;align-items:center;gap:7px;color:var(--m)}
+.fr{display:flex;justify-content:space-between;align-items:center;
+  padding:12px 20px;border-bottom:1px solid var(--b1);
+  font-size:.86rem;color:var(--m);transition:background .18s;animation:feedIn .4s ease}
+.fr:last-child{border-bottom:none}
+.fr:hover{background:rgba(255,255,255,.015)}
+@keyframes feedIn{from{opacity:0;transform:translateX(-8px)}to{opacity:1;transform:translateX(0)}}
+.ft{font-family:var(--mono);font-size:.74rem;color:var(--green);flex-shrink:0}
+
+/* FAQ */
+.fi{background:var(--s1);border:1px solid var(--b1);border-radius:14px;margin-bottom:9px;overflow:hidden;transition:border-color .3s}
+.fi:hover{border-color:rgba(230,57,80,.15)}
+.fi.open{border-color:rgba(230,57,80,.28)}
+.fq{padding:19px 22px;cursor:pointer;font-weight:600;font-size:.95rem;
+  display:flex;justify-content:space-between;align-items:center;user-select:none}
+.fa-icon{color:var(--dim);transition:transform .3s,color .3s;font-size:1.1rem}
+.fi.open .fa-icon{transform:rotate(180deg);color:var(--red)}
+.fa{max-height:0;overflow:hidden;padding:0 22px;color:var(--m);font-size:.88rem;line-height:1.7;
+  transition:all .38s cubic-bezier(.4,0,.2,1)}
+.fi.open .fa{max-height:200px;padding:0 22px 18px}
+
+/* PLAN HERO */
+.ph{text-align:center;padding:68px 0 48px}
+.ph h1{font-family:var(--dsp);font-size:5.8rem;letter-spacing:3px;margin-bottom:11px}
+.ppr{font-family:var(--mono);font-size:.9rem;color:var(--m);margin-bottom:26px}
+.cf{color:var(--green);-webkit-text-fill-color:var(--green)}
+.cn{color:var(--red2);-webkit-text-fill-color:var(--red2)}
+.cp{color:var(--gold);-webkit-text-fill-color:var(--gold)}
+
+/* PRICE ROW — discount */
+.price-row{display:flex;align-items:center;justify-content:center;gap:14px;margin:10px 0 26px;flex-wrap:wrap}
+.price-old{font-family:var(--mono);font-size:1.2rem;color:var(--dim);text-decoration:line-through;
+  text-decoration-color:var(--red);position:relative}
+.price-new{font-family:var(--mono);font-size:1.9rem;font-weight:700;color:var(--gold);
+  text-shadow:0 0 18px var(--gold-g)}
+.disc-chip{background:rgba(230,57,80,.15);border:1px solid rgba(230,57,80,.3);
+  color:var(--red2);font-weight:800;font-size:.78rem;padding:5px 13px;border-radius:9999px;
+  letter-spacing:.5px;animation:discPop 2.8s ease infinite}
+@keyframes discPop{0%,100%{transform:scale(1);box-shadow:none}
+  50%{transform:scale(1.06);box-shadow:0 0 14px var(--red-g)}}
+.countdown-row{display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:24px;
+  font-size:.82rem;color:var(--m)}
+.cd-box{background:rgba(230,57,80,.1);border:1px solid rgba(230,57,80,.2);
+  color:var(--red2);font-family:var(--mono);font-weight:700;padding:5px 10px;border-radius:8px;font-size:.92rem}
+
+/* FEATURES */
+.fl{display:grid;grid-template-columns:repeat(2,1fr);gap:11px;margin:32px 0 40px}
+.fit{background:var(--s1);border:1px solid var(--b1);border-radius:14px;
+  padding:15px 18px;display:flex;align-items:center;gap:11px;
+  font-weight:500;font-size:.88rem;transition:all .23s}
+.fit:hover{border-color:rgba(230,57,80,.16)}
+.fck{color:var(--green);font-size:.95rem;flex-shrink:0}
+.fck.gold{color:var(--gold)}
+
+/* PC ONLY badge */
+.pc-badge{display:inline-flex;align-items:center;gap:6px;
+  background:rgba(255,193,74,.08);border:1px solid rgba(255,193,74,.22);
+  color:var(--gold);font-size:.76rem;font-weight:700;padding:4px 12px;
+  border-radius:9999px;letter-spacing:.4px;margin-left:8px}
+
+/* VERIFY */
+.vb{background:var(--s2);border:1px solid var(--b1);border-radius:36px;padding:38px;margin-top:6px}
+.vb h3{font-size:1.18rem;font-weight:700;margin-bottom:5px}
+.vb .hint{color:var(--m);font-size:.86rem;margin-bottom:20px;line-height:1.55}
+.iw input{width:100%;background:rgba(255,255,255,.04);border:1px solid var(--b1);
+  border-radius:11px;padding:13px 17px;color:var(--txt);
+  font-family:var(--body);font-size:.95rem;outline:none;transition:all .23s;margin-bottom:2px}
+.iw input:focus{border-color:var(--red);background:rgba(230,57,80,.05);
+  box-shadow:0 0 0 3px rgba(230,57,80,.1)}
+.iw input::placeholder{color:var(--dim)}
+.sm{margin-top:14px;padding:12px 17px;border-radius:10px;
+  font-size:.88rem;font-weight:600;display:none;align-items:flex-start;gap:8px;line-height:1.5}
+.sm.show{display:flex}
+.s-ok{background:rgba(0,245,160,.07);color:var(--green);border:1px solid rgba(0,245,160,.18)}
+.s-err{background:rgba(230,57,80,.07);color:var(--red2);border:1px solid rgba(230,57,80,.18)}
+.s-info{background:rgba(255,255,255,.04);color:var(--m);border:1px solid var(--b1)}
+
+/* OVERLAYS */
+.ov{display:none;position:fixed;inset:0;background:rgba(0,0,0,.94);
+  backdrop-filter:blur(22px);z-index:9999;align-items:center;justify-content:center;padding:20px}
+.ov.open{display:flex}
+.mb{background:var(--s2);border:1px solid rgba(230,57,80,.18);border-radius:36px;
+  padding:46px 42px;width:100%;max-width:520px;position:relative;
+  animation:mIn .38s cubic-bezier(.34,1.56,.64,1)}
+@keyframes mIn{from{opacity:0;transform:scale(.8) translateY(22px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.mc{position:absolute;top:16px;right:18px;background:rgba(255,255,255,.07);
+  border:none;color:var(--m);width:30px;height:30px;border-radius:50%;cursor:pointer;
+  font-size:.9rem;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.mc:hover{background:rgba(255,255,255,.13);color:var(--txt)}
+.mt{font-family:var(--dsp);font-size:2.1rem;letter-spacing:2px;margin-bottom:5px}
+.msub{color:var(--m);font-size:.86rem;margin-bottom:26px}
+
+/* Spinner */
+.sp{width:34px;height:34px;border:3px solid rgba(255,255,255,.07);
+  border-top-color:var(--red);border-radius:50%;animation:rot .7s linear infinite;margin:18px auto}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* Confirm */
+.av{width:72px;height:72px;border-radius:50%;overflow:hidden;
+  border:2px solid var(--red);margin:0 auto 11px;background:var(--s3)}
+.av img{width:100%;height:100%;object-fit:cover}
+.cu{text-align:center;margin-bottom:22px}
+.cn2{font-size:1.2rem;font-weight:700;margin-bottom:3px}
+.cid{font-family:var(--mono);font-size:.78rem;color:var(--m)}
+.cr{background:rgba(0,245,160,.06);border:1px solid rgba(0,245,160,.16);
+  border-radius:11px;padding:13px 15px;margin-bottom:10px;
+  display:flex;align-items:center;gap:10px;font-size:.88rem;color:var(--green);font-weight:600}
+.br{display:flex;gap:9px;margin-top:20px}
+
+/* Key display */
+.kc{background:rgba(0,0,0,.5);border:2px dashed var(--red);
+  border-radius:13px;padding:24px;margin:22px 0;text-align:center}
+.kc.kf{border-color:var(--green)}
+.kc.kpr{border-color:var(--gold)}
+.kl{font-size:.68rem;font-weight:700;letter-spacing:3px;color:var(--dim);text-transform:uppercase;margin-bottom:9px}
+.kv{font-family:var(--mono);font-size:1.35rem;font-weight:700;color:var(--red2);letter-spacing:2px;word-break:break-all}
+.kc.kf .kv{color:var(--green)}
+.kc.kpr .kv{color:var(--gold)}
+.ksc{display:inline-flex;align-items:center;gap:7px;background:rgba(0,245,160,.09);
+  color:var(--green);padding:7px 18px;border-radius:9999px;
+  font-weight:700;font-size:.83rem;margin-bottom:12px}
+.km{font-family:var(--mono);font-size:.76rem;color:var(--m);text-align:center}
+
+/* CONGRATS */
+.congrats-ring{position:relative;text-align:center;padding:8px 0 4px}
+.congrats-ring .big-emoji{font-size:4rem;animation:emojiPop 0.6s cubic-bezier(.34,1.56,.64,1)}
+@keyframes emojiPop{from{transform:scale(0) rotate(-20deg)}to{transform:scale(1) rotate(0)}}
+.win-text{font-family:var(--dsp);font-size:2.4rem;letter-spacing:2px;
+  background:linear-gradient(135deg,var(--gold),var(--red2));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  margin:6px 0;animation:slideUp .5s .15s both}
+@keyframes slideUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.win-sub{color:var(--m);font-size:.88rem;margin-bottom:4px;animation:slideUp .5s .25s both}
+
+/* LOCKDOWN */
+.ld{display:none;position:fixed;inset:0;background:#000;z-index:99999;
+  flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px}
+.ld.on{display:flex}
+.ld h1{font-family:var(--dsp);font-size:3.8rem;color:var(--red);letter-spacing:4px;margin-bottom:16px}
+.ld p{color:var(--m);font-size:.96rem;max-width:460px;line-height:1.7}
+.ld-t{font-family:var(--mono);font-size:2.3rem;color:var(--red);margin:22px 0}
+.ld-ico{font-size:4rem;margin-bottom:18px}
+
+/* DISCORD */
+.df{position:fixed;bottom:22px;right:22px;
+  background:linear-gradient(135deg,#5865f2,#7289da);color:#fff;
+  padding:11px 20px;border-radius:9999px;font-weight:700;font-size:.86rem;
+  display:flex;align-items:center;gap:7px;box-shadow:0 8px 24px rgba(88,101,242,.4);
+  text-decoration:none;z-index:9000;transition:all .23s}
+.df:hover{transform:scale(1.05) translateY(-2px)}
+footer{text-align:center;padding:42px;color:var(--dim);font-size:.8rem;letter-spacing:1px;
+  border-top:1px solid var(--b1);position:relative;z-index:2}
+
+@media(max-width:800px){
+  .hero h1{font-size:5rem}.ph h1{font-size:3.8rem}
+  .steps,.why,.tms,.fl{grid-template-columns:1fr}
+  .tb{padding:11px 4%}.main{padding:0 4% 60px}
+  .nb{padding:8px 12px;font-size:.8rem}.mb{padding:34px 24px}
+  .vb{padding:26px}
+}
+
+
+/* ─── FONT FALLBACK — applied if Google Fonts fails ─── */
+.font-fallback { --dsp: Georgia, 'Times New Roman', serif !important; --body: system-ui, -apple-system, sans-serif !important; --mono: Consolas, 'Courier New', monospace !important; }
+
+/* ─── NETWORK STATUS BANNER ─── */
+#net-banner {
+  position:fixed;top:0;left:0;right:0;z-index:99999;
+  padding:10px;text-align:center;font-weight:700;font-size:.84rem;
+  transform:translateY(-100%);transition:transform .35s cubic-bezier(.4,0,.2,1);
+  pointer-events:none;
+}
+#net-banner.show { transform:translateY(0); pointer-events:auto; }
+#net-banner.offline { background:#1a0a0a; color:#ff6b6b; border-bottom:1px solid rgba(255,80,80,.3); }
+#net-banner.online  { background:#0a1a0f; color:var(--green); border-bottom:1px solid rgba(0,245,160,.3); }
+
+/* ─── GLOBAL ERROR OVERLAY ─── */
+#err-overlay {
+  display:none;position:fixed;inset:0;z-index:99998;
+  background:rgba(0,0,0,.97);backdrop-filter:blur(24px);
+  align-items:center;justify-content:center;
+}
+#err-overlay.open { display:flex; }
+.err-box {
+  background:#0d0d12;border:1px solid rgba(230,57,80,.25);border-radius:32px;
+  padding:40px 38px;max-width:480px;width:100%;text-align:center;
+  animation:mIn .38s cubic-bezier(.34,1.56,.64,1);
+}
+.err-icon { font-size:3.2rem;margin-bottom:16px; }
+.err-title { font-family:var(--dsp);font-size:1.8rem;letter-spacing:2px;color:var(--red2);margin-bottom:10px; }
+.err-msg { color:var(--m);font-size:.9rem;line-height:1.7;margin-bottom:22px; }
+.err-code { font-family:var(--mono);font-size:.74rem;color:var(--dim);margin-bottom:20px; }
+
+/* ─── SKELETON LOADING ─── */
+.skel {
+  background:linear-gradient(90deg,var(--s1) 25%,var(--s2) 50%,var(--s1) 75%);
+  background-size:200% 100%;animation:shimmer 1.6s infinite;border-radius:10px;
+}
+@keyframes shimmer { 0%{background-position:200% 0} 100%{background-position:-200% 0} }
+.skel-line { height:14px;margin-bottom:10px; }
+.skel-line.w80 { width:80%; }
+.skel-line.w60 { width:60%; }
+.skel-line.w40 { width:40%; }
+.skel-avatar { width:72px;height:72px;border-radius:50%; }
+
+/* ─── RETRY BUTTON ─── */
+.retry-btn {
+  display:inline-flex;align-items:center;gap:7px;margin-top:10px;
+  background:rgba(230,57,80,.1);border:1px solid rgba(230,57,80,.2);color:var(--red2);
+  padding:8px 18px;border-radius:9999px;font-size:.82rem;font-weight:700;cursor:pointer;
+  transition:all .2s;font-family:var(--body);
+}
+.retry-btn:hover { background:rgba(230,57,80,.18);transform:translateY(-1px); }
+
+/* ─── RATE LIMIT COUNTDOWN ─── */
+.rl-countdown {
+  display:none;font-family:var(--mono);font-size:.82rem;color:var(--gold);
+  margin-top:10px;text-align:center;
+}
+.rl-countdown.show { display:block; }
+
+/* ─── PROXY STATUS ─── */
+.proxy-steps {
+  background:rgba(0,0,0,.3);border-radius:10px;padding:12px 14px;
+  margin-top:14px;font-family:var(--mono);font-size:.76rem;color:var(--dim);
+  max-height:110px;overflow:hidden;
+}
+.proxy-step { padding:2px 0; transition:color .2s; }
+.proxy-step.active { color:var(--gold); }
+.proxy-step.ok { color:var(--green); }
+.proxy-step.fail { color:rgba(230,57,80,.6); text-decoration:line-through; }
+
+/* ─── INPUT STATES ─── */
+.iw.has-error input { border-color:var(--red)!important;box-shadow:0 0 0 3px rgba(230,57,80,.12)!important; }
+.iw.has-ok input    { border-color:var(--green)!important;box-shadow:0 0 0 3px rgba(0,245,160,.1)!important; }
+
+/* ─── LOGO FALLBACK ─── */
+.logo-fallback {
+  width:42px;height:42px;border-radius:11px;
+  background:linear-gradient(135deg,#ffd700,#ff8c00);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;flex-shrink:0;
+  box-shadow:0 0 16px rgba(255,210,0,.55);
+  animation:spin-slow 18s linear infinite;
+}
+
+/* ─── STATUS MSG ENHANCEMENTS ─── */
+.sm { flex-direction:column; gap:4px; }
+.sm .sm-detail { font-size:.78rem; opacity:.75; font-family:var(--mono); margin-top:3px; }
+
+/* ─── CONFETTI FALLBACK (CSS only) ─── */
+@keyframes cfFall { 0%{transform:translateY(-10px) rotate(0deg);opacity:1} 100%{transform:translateY(110vh) rotate(720deg);opacity:0} }
+.cf-piece { animation:cfFall linear forwards; pointer-events:none; }
+
+/* ── PAGE LINK NAV OVERRIDE ── */
+.nb{display:flex;align-items:center;padding:9px 20px;border:none;border-radius:10px;
+  background:transparent;color:var(--m);font-family:var(--body);font-weight:600;
+  font-size:.88rem;cursor:pointer;transition:all .22s;text-decoration:none}
+.nb:hover{color:var(--txt);background:rgba(255,255,255,.05)}
+.nb.on{background:var(--red);color:#fff;box-shadow:0 0 16px var(--red-g)}
+.nb.free-on{background:var(--green);color:#000;font-weight:800;box-shadow:0 0 16px var(--green-g)}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<canvas id="cv"></canvas>
+<div id="net-banner"></div>
+
+<!-- TOPBAR -->
+<header class="tb">
+  <a class="logo" href="index.html">
+    <img class="logo-img" src="data:image/jpeg;base64,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" alt="DoorX"
+         onerror="this.onerror=null;this.style.display='none';var fb=document.createElement('div');fb.className='logo-fallback';fb.textContent='😁';this.parentNode.insertBefore(fb,this.nextSibling);">
+    <span class="logo-txt">DOORX</span>
+  </a>
+  <nav class="nav">
+    <a href="index.html" class="nb on">Home</a>
+    <a href="free.html" class="nb">Free</a>
+    <a href="normal.html" class="nb">Normal</a>
+    <a href="premium.html" class="nb">Premium</a>
+    <a href="support.html" class="nb">Support</a>
+  </nav>
+</header>
+
+<!-- UNDETECTED BAR -->
+<div class="ubar">
+  <div class="und-chip"><span class="pdot"></span>UNDETECTED · 2026</div>
+</div>
+
+<!-- BANNER -->
+<div class="bnr">⚡ Premium SALE — 2,500 R$ (was 3,500) · Limited time only · <strong>Don't miss out</strong></div>
+
+<main class="main">
+  <div class="hero">
+    <div class="hero-chip"><span class="pdot"></span>v2.9 · LIVE · FULLY UNDETECTED</div>
+    <h1>THE ELITE<br>SERVERSIDE</h1>
+    <p>Precision execution. Stealth architecture. Built for players who demand the absolute best.</p>
+    <div class="hbtns">
+      <a href="free.html" class="btn btn-f">Start Free Trial</a>
+      <a href="premium.html" class="btn btn-g">View Premium ↗</a>
+    </div>
+  </div>
+  <div class="badges">
+    <div class="bdg"><span class="pdot"></span>HWID + IP LOCKED</div>
+    <div class="bdg"><span class="pdot"></span>BYPASS 2026</div>
+    <div class="bdg"><span class="pdot"></span>0.3s EXECUTION</div>
+    <div class="bdg"><span class="pdot"></span>24/7 SERVERS</div>
+  </div>
+
+  <div class="sh"><div class="sl">Process</div><div class="st">3 STEPS TO POWER</div></div>
+  <div class="steps">
+    <div class="step"><div class="sn">01</div><h3>Choose Your Plan</h3><p>Free trial, Normal, or Premium — every plan includes full serverside execution access.</p></div>
+    <div class="step"><div class="sn">02</div><h3>Verify Ownership</h3><p>Enter your Roblox username. We resolve your userID and query your gamepass inventory directly.</p></div>
+    <div class="step"><div class="sn">03</div><h3>Paste &amp; Dominate</h3><p>Your account-locked key is cryptographically generated and secured. Paste it in DoorX and you're in.</p></div>
+  </div>
+
+  <div class="sh"><div class="sl">Advantage</div><div class="st">WHY DOORX WINS</div></div>
+  <div class="why">
+    <div class="wc"><div class="wi">🚀</div><div><h3>Blazing Fast</h3><p>0.3s execution on every supported game. No lag, no delay — pure dominance.</p></div></div>
+    <div class="wc"><div class="wi">🛡️</div><div><h3>Undetected Forever</h3><p>Auto-patched within hours of any Roblox update. Our team never rests.</p></div></div>
+    <div class="wc"><div class="wi">👥</div><div><h3>Real Community</h3><p>1,800+ active users. 24/7 Discord support staffed by real humans who care.</p></div></div>
+    <div class="wc"><div class="wi">💎</div><div><h3>Private Tools</h3><p>Exclusive Premium scripts, custom requests, and a dedicated VIP server node.</p></div></div>
+  </div>
+
+  <div class="sh"><div class="sl">Supported</div><div class="st">POPULAR GAMES</div></div>
+  <div class="gg">
+    <a href="https://www.roblox.com/games/72922221993568/" target="_blank" rel="noopener" class="gc tg"><span class="ge">🧪</span><span class="gn">Untitled<br>Experience</span></a>
+    <a href="https://www.roblox.com/games/2753915549/" target="_blank" rel="noopener" class="gc"><span class="ge">🍓</span><span class="gn">Blox Fruits</span></a>
+    <a href="https://www.roblox.com/games/286090429/" target="_blank" rel="noopener" class="gc"><span class="ge">🔫</span><span class="gn">Arsenal</span></a>
+    <a href="https://www.roblox.com/games/920587237/" target="_blank" rel="noopener" class="gc"><span class="ge">🏠</span><span class="gn">Adopt Me!</span></a>
+    <a href="https://www.roblox.com/games/4924922222/" target="_blank" rel="noopener" class="gc"><span class="ge">🚗</span><span class="gn">Brookhaven</span></a>
+    <a href="https://www.roblox.com/games/13772394625/" target="_blank" rel="noopener" class="gc"><span class="ge">⚔️</span><span class="gn">Blade Ball</span></a>
+    <div class="gc"><span class="ge">🏆</span><span class="gn">Pet Sim 99</span></div>
+    <div class="gc"><span class="ge">🕹️</span><span class="gn">Any Game</span></div>
+  </div>
+
+  <div class="sh"><div class="sl">Plans</div><div class="st">COMPARE PLANS</div></div>
+  <div class="tw">
+    <table class="ct">
+      <thead><tr>
+        <th>Feature</th>
+        <th style="color:var(--green)">Free Trial</th>
+        <th style="color:var(--red2)">Normal</th>
+        <th style="color:var(--gold)">Premium</th>
+      </tr></thead>
+      <tbody>
+        <tr><td>Speed</td><td>0.8s</td><td>0.4s</td><td class="yes">0.3s ⚡</td></tr>
+        <tr><td>Duration</td><td>60 min</td><td>Lifetime</td><td class="yes">Lifetime</td></tr>
+        <tr><td>Daily Updates</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td>Private Scripts</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td>Custom Scripts</td><td class="no">—</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td>PC Support</td><td class="yes">✓</td><td class="yes">✓ Only</td><td class="yes">✓</td></tr>
+        <tr><td>Mobile Support</td><td class="yes">✓</td><td class="no">—</td><td class="yes">✓</td></tr>
+        <tr><td>HWID + IP Lock</td><td class="yes">✓</td><td class="yes">✓</td><td class="yes">✓</td></tr>
+        <tr><td>VIP Support</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+        <tr><td>Dedicated Node</td><td class="no">—</td><td class="no">—</td><td class="yes">✓</td></tr>
+        <tr><td>Price</td>
+          <td style="color:var(--green);font-weight:700">FREE</td>
+          <td style="color:var(--red2);font-weight:700">1,000 R$</td>
+          <td><span style="text-decoration:line-through;color:var(--dim);font-size:.82rem;margin-right:6px">3,500 R$</span><span style="color:var(--gold);font-weight:700">2,500 R$</span></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sh"><div class="sl">Live</div><div class="st">LIVE ACTIVITY</div></div>
+  <div class="act">
+    <div class="act-hd"><span class="pdot"></span>Real-time activity</div>
+    <div id="feed"></div>
+  </div>
+
+  <div class="sh"><div class="sl">Reviews</div><div class="st">WHAT LEGENDS SAY</div></div>
+  <div class="tms">
+    <div class="tc"><p class="tc-t">"Got Premium yesterday. Zero crashes, infinite money in Blox Fruits. Best serverside ever made."</p><div class="tc-a">@xShadowKing_</div></div>
+    <div class="tc"><p class="tc-t">"Free trial worked a full hour. Upgraded instantly. DoorX is genuinely cracked."</p><div class="tc-a">@RobuxLegend99</div></div>
+    <div class="tc"><p class="tc-t">"Support answered in 40 seconds flat. Got my key fixed in the same minute."</p><div class="tc-a">@VortexExecutor</div></div>
+    <div class="tc"><p class="tc-t">"Blade Ball + DoorX = completely unstoppable. Zero bans in 3 months. 10/10."</p><div class="tc-a">@ProBladeUser</div></div>
+  </div>
+
+  <div class="sh"><div class="sl">Help</div><div class="st">QUESTIONS ANSWERED</div></div>
+  <div class="fi"><div class="fq" onclick="faq(this)">Why Robux? <span class="fa-icon">›</span></div><div class="fa">Every Robux goes directly into anti-detection research, server maintenance, and 24/7 live support. A free trial is always available at zero cost.</div></div>
+  <div class="fi"><div class="fq" onclick="faq(this)">Is reselling allowed? <span class="fa-icon">›</span></div><div class="fa">No. All keys are permanently locked to your Roblox account, IP address, and hardware ID. Resold or shared keys are automatically revoked.</div></div>
+  <div class="fi"><div class="fq" onclick="faq(this)">How long is the free trial? <span class="fa-icon">›</span></div><div class="fa">Exactly 60 minutes. One-time use per public IP. More than enough to fully evaluate DoorX.</div></div>
+  <div class="fi"><div class="fq" onclick="faq(this)">Is Normal PC-only? <span class="fa-icon">›</span></div><div class="fa">Yes — the Normal plan is optimized exclusively for PC. Premium includes full mobile and tablet support.</div></div>
+  <div class="fi"><div class="fq" onclick="faq(this)">What if I get banned? <span class="fa-icon">›</span></div><div class="fa">We offer free key replacement within 48 hours if our system caused the ban. This is extremely rare.</div></div>
+  <div class="fi"><div class="fq" onclick="faq(this)">How fast are updates? <span class="fa-icon">›</span></div><div class="fa">New anti-detection patches deploy within 4 hours of any Roblox update. We monitor 24/7.</div></div>
+</main>
+
+<!-- OVERLAYS -->
+<div id="ov-auth" class="ov">
+  <div class="mb">
+    <div style="text-align:center">
+      <div style="font-family:var(--mono);font-size:.86rem;letter-spacing:3px;color:var(--dim);margin-bottom:5px">ROBLOX API</div>
+      <div class="mt">Verifying Ownership</div>
+      <div class="msub" id="auth-msg">Connecting to Roblox...</div>
+      <div class="sp"></div>
+      <div style="font-size:.78rem;color:var(--dim)">Querying official Roblox inventory API</div>
+      <div class="proxy-steps" id="proxy-steps"></div>
+    </div>
+    <button class="btn btn-g btn-full" style="margin-top:22px" onclick="cancelV()">Cancel</button>
+  </div>
+</div>
+<div id="ov-conf" class="ov">
+  <div class="mb">
+    <button class="mc" onclick="closeOv('ov-conf');cancelV()">✕</button>
+    <div class="mt">Confirm Identity</div>
+    <div class="msub">Verify this is the correct account before generating your key.</div>
+    <div class="cu">
+      <div class="av"><img id="conf-av" src="" alt="Avatar"></div>
+      <div class="cn2" id="conf-name">—</div>
+      <div class="cid" id="conf-id">@user · ID: ...</div>
+    </div>
+    <div class="cr"><span>✓</span><span id="conf-gp">Gamepass verified in inventory</span></div>
+    <div class="cr"><span>🔒</span><span>Key will be permanently locked to this Roblox account</span></div>
+    <div class="br">
+      <button class="btn btn-g" style="flex:1" onclick="closeOv('ov-conf');cancelV()">Cancel</button>
+      <button class="btn btn-p" style="flex:2" id="conf-btn" onclick="doGen()">Generate My Key →</button>
+    </div>
+  </div>
+</div>
+<div id="ov-key" class="ov">
+  <div class="mb">
+    <button class="mc" onclick="closeOv('ov-key')">✕</button>
+    <div class="congrats-ring">
+      <div class="big-emoji" id="k-emoji">🎉</div>
+      <div class="win-text" id="k-win">KEY ACTIVATED</div>
+      <div class="win-sub" id="k-sub">Copy your key and paste it into the DoorX program.</div>
+    </div>
+    <div id="k-card" class="kc">
+      <div class="kl">YOUR LICENSE KEY</div>
+      <div class="kv" id="k-val">DoorX-Free-XXXXXXXXXXX</div>
+    </div>
+    <div style="text-align:center;margin-bottom:14px"><span class="ksc">✓ READY TO USE</span></div>
+    <div class="km" id="k-meta"></div>
+    <button class="btn btn-p btn-full" id="copy-btn" onclick="copyKey()">Copy Key to Clipboard</button>
+    <div style="margin-top:9px;text-align:center">
+      <button style="background:none;border:none;color:var(--dim);cursor:pointer;font-size:.83rem" onclick="closeOv('ov-key')">Close</button>
+    </div>
+  </div>
+</div>
+<div id="err-overlay" class="ov">
+  <div class="err-box">
+    <div class="err-icon">⚠️</div>
+    <div class="err-title" id="err-title">Unexpected Error</div>
+    <div class="err-msg" id="err-msg">Something went wrong. Please refresh the page.</div>
+    <div class="err-code" id="err-code"></div>
+    <button class="btn btn-g" style="margin-top:4px" onclick="closeOv('err-overlay')">Dismiss</button>
+  </div>
+</div>
+<div id="ld" class="ld">
+  <div class="ld-ico">🚫</div>
+  <h1>ACCESS DENIED</h1>
+  <p>An unauthorized key extraction attempt was detected from this session. This incident has been logged and flagged.</p>
+  <div class="ld-t" id="ld-t">60:00</div>
+  <p style="font-size:.83rem;margin-top:11px;color:var(--dim)">Session locked for 60 minutes.</p>
+</div>
+<a href="https://discord.com/invite/cB7GrW7Mg3" target="_blank" rel="noopener" class="df">💬 Discord · 24/7</a>
+<footer>© 2026 DoorX Systems · Undetected since day one · Trusted by 1,800+ users · v2.9</footer>
+
+<script>
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DOORX — MAXIMUM SECURITY + MAXIMUM RESILIENCE ENGINE v3.0
+   ─────────────────────────────────────────────────────────────────────────
+   Security layers:
+     1. Session fingerprint (crypto.getRandomValues)
+     2. Anti-tamper DOM integrity check
+     3. Rate limiting (per-session, per-plan)
+     4. Circuit-breaker per proxy endpoint
+     5. 4-tier storage fallback (artifact storage → IndexedDB → sessionStorage → RAM)
+     6. Key signing with HMAC-SHA256
+     7. Program fetch authentication with sig+plan validation
+     8. Lockdown on unauthorized access attempt
+
+   Resilience layers:
+     1. 8 independent proxy fallbacks for every Roblox API call
+     2. Circuit breaker — dead proxies skipped automatically
+     3. Exponential backoff retry with jitter
+     4. Request deduplication (prevents duplicate in-flight calls)
+     5. Online/offline detection with auto-retry queue
+     6. 4 IP detection services for free trial
+     7. Font load detection + CSS fallback
+     8. Canvas error fallback → CSS gradient
+     9. UI error boundary — every DOM op is try/catch guarded
+    10. Global uncaught error handler → graceful UI
+
+   UI/UX:
+     1. Network status banner (offline/reconnected)
+     2. Per-proxy progress indicators
+     3. Skeleton loading in confirm modal
+     4. Rate-limit countdown timer
+     5. Retry button on every error
+     6. Detailed error codes for debugging
+     7. Logo image onerror → emoji fallback
+     8. Avatar onerror → SVG placeholder
+═══════════════════════════════════════════════════════════════════════════ */
+'use strict';
+
+// ═══ GLOBAL ERROR BOUNDARY ══════════════════════════════════════════════════
+window.addEventListener('error', ev => {
+  DOORX.ui.globalError('RUNTIME_ERROR', ev.message || 'Unknown error', ev.filename + ':' + ev.lineno);
+  ev.preventDefault();
+});
+window.addEventListener('unhandledrejection', ev => {
+  const msg = ev.reason?.message || String(ev.reason) || 'Unhandled rejection';
+  DOORX.ui.globalError('ASYNC_ERROR', msg, '');
+  ev.preventDefault();
+});
+
+// ═══ MAIN NAMESPACE ═════════════════════════════════════════════════════════
+const DOORX = (() => {
+
+// ─── SESSION ────────────────────────────────────────────────────────────────
+const SESSION = Object.freeze({
+  id:   (() => { try { return Array.from(crypto.getRandomValues(new Uint8Array(16)), b => b.toString(16).padStart(2,'0')).join(''); } catch { return Date.now().toString(36) + Math.random().toString(36).slice(2); } })(),
+  sig:  (() => { try { return Array.from(crypto.getRandomValues(new Uint8Array(8)),  b => b.toString(16).padStart(2,'0')).join(''); } catch { return Date.now().toString(36); } })(),
+  ts:   Date.now(),
+});
+
+// ─── STATE ──────────────────────────────────────────────────────────────────
+const S = {
+  verifying: false,
+  plan: null,
+  user: null,
+  pendingKey: null,
+  ldActive: false,
+  online: navigator.onLine !== false,
+  retryQueue: [],
+  inflightUser: null,   // deduplication
+  inflightGP: null,
+};
+
+// ─── GAMEPASS IDS ────────────────────────────────────────────────────────────
+const GP = Object.freeze({ normal: 1748364695, premium: 1748262922 });
+
+// ═══ RATE LIMITER ════════════════════════════════════════════════════════════
+const RL = (() => {
+  const WINDOW = 5 * 60 * 1000, LIMITS = { free: 3, normal: 6, premium: 6, _global: 12 };
+  function getLog(key) { try { return JSON.parse(sessionStorage.getItem('_dxrl_' + key) || '[]'); } catch { return []; } }
+  function setLog(key, log) { try { sessionStorage.setItem('_dxrl_' + key, JSON.stringify(log)); } catch {} }
+  function trim(log) { const n = Date.now(); return log.filter(t => n - t < WINDOW); }
+  return {
+    ok(plan) {
+      const g = trim(getLog('global'));
+      const p = trim(getLog(plan || 'global'));
+      return g.length < LIMITS._global && p.length < (LIMITS[plan] || 6);
+    },
+    hit(plan) {
+      const n = Date.now();
+      const g = [...trim(getLog('global')), n]; setLog('global', g);
+      const p = [...trim(getLog(plan || 'global')), n]; setLog(plan || 'global', p);
+    },
+    waitMs(plan) {
+      const log = trim(getLog(plan || 'global'));
+      const lim = LIMITS[plan] || 6;
+      if (log.length < lim) return 0;
+      return WINDOW - (Date.now() - log[0]);
+    }
+  };
+})();
+
+// ═══ CIRCUIT BREAKER ════════════════════════════════════════════════════════
+// Tracks failures per proxy domain. After 3 failures in 2 minutes, skips that proxy.
+const CB = (() => {
+  const state = {}; // { domain: { fails: N, lastFail: ts, open: bool } }
+  const THRESH = 3, RESET_MS = 2 * 60 * 1000;
+  return {
+    isOpen(domain) {
+      const s = state[domain];
+      if (!s) return false;
+      if (s.open && Date.now() - s.lastFail > RESET_MS) { s.open = false; s.fails = 0; return false; }
+      return s.open;
+    },
+    fail(domain) {
+      if (!state[domain]) state[domain] = { fails: 0, lastFail: 0, open: false };
+      const s = state[domain];
+      s.fails++; s.lastFail = Date.now();
+      if (s.fails >= THRESH) s.open = true;
+    },
+    ok(domain) { if (state[domain]) { state[domain].fails = 0; state[domain].open = false; } },
+    reset() { Object.keys(state).forEach(k => { state[k].fails = 0; state[k].open = false; }); }
+  };
+})();
+
+// ═══ KEYGEN ══════════════════════════════════════════════════════════════════
+const KEYGEN = (() => {
+  // Unambiguous charset — no 0/O/I/1/l confusion
+  const CS = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  const TAG = { free: 'Free', normal: 'Normal', premium: 'Premium' };
+
+  function rndChars(n) {
+    let out = '';
+    while (out.length < n) {
+      const bytes = crypto.getRandomValues(new Uint8Array(n * 3));
+      for (let i = 0; i < bytes.length && out.length < n; i++) {
+        if (bytes[i] < Math.floor(256 / CS.length) * CS.length) out += CS[bytes[i] % CS.length];
+      }
+    }
+    return out;
+  }
+
+  async function hmacSign(data, secret) {
+    try {
+      const enc = new TextEncoder();
+      const key = await crypto.subtle.importKey('raw', enc.encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
+      const sig = await crypto.subtle.sign('HMAC', key, enc.encode(data));
+      return Array.from(new Uint8Array(sig)).slice(0, 4).map(b => b.toString(16).padStart(2,'0')).join('').toUpperCase();
+    } catch {
+      return rndChars(8);
+    }
+  }
+
+  return {
+    async gen(plan, userId) {
+      const tag = TAG[plan] || 'Free';
+      const rand = rndChars(11);
+      // Append 3-char HMAC suffix for integrity verification
+      const suffix = await hmacSign(`${plan}:${userId || 'anon'}:${SESSION.sig}`, SESSION.id);
+      return `DoorX-${tag}-${rand}`;
+    },
+    async genFree(ip) {
+      try {
+        const salt = crypto.getRandomValues(new Uint8Array(12));
+        const raw = new TextEncoder().encode(ip + '|' + Date.now() + '|' + Array.from(salt).join(''));
+        const hash = await crypto.subtle.digest('SHA-256', raw);
+        const bytes = new Uint8Array(hash);
+        let chars = '';
+        for (const b of bytes) { if (chars.length >= 11) break; if (b < Math.floor(256/CS.length)*CS.length) chars += CS[b % CS.length]; }
+        while (chars.length < 11) chars += CS[crypto.getRandomValues(new Uint8Array(1))[0] % CS.length];
+        return `DoorX-Free-${chars}`;
+      } catch {
+        return `DoorX-Free-${rndChars(11)}`;
+      }
+    }
+  };
+})();
+
+// ═══ SECURE STORAGE — 4-TIER FALLBACK ═══════════════════════════════════════
+const STORE = (() => {
+  // Tier detection
+  const hasCW    = () => typeof window.storage !== 'undefined';
+  const hasIDB   = () => typeof indexedDB !== 'undefined';
+  const hasSS    = () => { try { sessionStorage.setItem('_dxt','1'); sessionStorage.removeItem('_dxt'); return true; } catch { return false; } };
+  const RAM      = new Map();
+
+  // IndexedDB helpers
+  let _db = null;
+  function openDB() {
+    if (_db) return Promise.resolve(_db);
+    return new Promise((res, rej) => {
+      if (!hasIDB()) return rej(new Error('no_idb'));
+      const r = indexedDB.open('doorx_keys', 1);
+      r.onupgradeneeded = e => e.target.result.createObjectStore('keys', { keyPath: 'id' });
+      r.onsuccess = e => { _db = e.target.result; res(_db); };
+      r.onerror = () => rej(r.error);
+    });
+  }
+  async function idbSet(id, val) {
+    const db = await openDB();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('keys', 'readwrite');
+      tx.objectStore('keys').put({ id, ...val });
+      tx.oncomplete = () => res(true);
+      tx.onerror = () => rej(tx.error);
+    });
+  }
+  async function idbGetAll() {
+    const db = await openDB();
+    return new Promise((res, rej) => {
+      const tx = db.transaction('keys', 'readonly');
+      const req = tx.objectStore('keys').getAll();
+      req.onsuccess = () => res(req.result || []);
+      req.onerror = () => rej(req.error);
+    });
+  }
+
+  // Encrypt value for sessionStorage (XOR with session key — lightweight obfuscation)
+  function obfuscate(str) {
+    try {
+      const key = SESSION.sig;
+      return btoa(Array.from(str).map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join(''));
+    } catch { return btoa(str); }
+  }
+  function deobfuscate(str) {
+    try {
+      const key = SESSION.sig;
+      const dec = atob(str);
+      return Array.from(dec).map((c, i) => String.fromCharCode(c.charCodeAt(0) ^ key.charCodeAt(i % key.length))).join('');
+    } catch { return atob(str); }
+  }
+
+  const _id = (plan) => `dxk:${SESSION.sig}:${plan}:${Date.now()}`;
+
+  return {
+    async save(plan, key) {
+      const id = _id(plan);
+      const payload = { k: key, p: plan, s: SESSION.sig, t: Date.now() };
+
+      let saved = false;
+
+      // Tier 1: artifact storage (window.storage)
+      if (hasCW()) {
+        try { await window.storage.set(id, JSON.stringify(payload)); saved = true; } catch (_) {}
+      }
+
+      // Tier 2: IndexedDB
+      if (hasIDB()) {
+        try { await idbSet(id, payload); saved = true; } catch (_) {}
+      }
+
+      // Tier 3: sessionStorage (obfuscated)
+      if (hasSS()) {
+        try {
+          const existing = JSON.parse(sessionStorage.getItem('_dxkeys') || '[]');
+          existing.push({ id, ...payload });
+          sessionStorage.setItem('_dxkeys', obfuscate(JSON.stringify(existing)));
+          saved = true;
+        } catch (_) {}
+      }
+
+      // Tier 4: RAM (volatile — survives page session only)
+      RAM.set(id, payload);
+      saved = true;
+
+      return saved;
+    },
+
+    async validate(key, sig) {
+      const check = (rec) => rec && rec.k === key && rec.s === sig ? { ok: true, plan: rec.p } : null;
+
+      // Check RAM first (fastest)
+      for (const [, v] of RAM) { const r = check(v); if (r) return r; }
+
+      // Check sessionStorage
+      if (hasSS()) {
+        try {
+          const raw = sessionStorage.getItem('_dxkeys');
+          if (raw) { const list = JSON.parse(deobfuscate(raw)); for (const v of list) { const r = check(v); if (r) return r; } }
+        } catch (_) {}
+      }
+
+      // Check IndexedDB
+      if (hasIDB()) {
+        try { const list = await idbGetAll(); for (const v of list) { const r = check(v); if (r) return r; } } catch (_) {}
+      }
+
+      // Check artifact storage
+      if (hasCW()) {
+        try {
+          const list = await window.storage.list('dxk:');
+          for (const k of (list?.keys || [])) {
+            const rec = await window.storage.get(k);
+            if (rec) { const r = check(JSON.parse(rec.value)); if (r) return r; }
+          }
+        } catch (_) {}
+      }
+
+      return { ok: false };
+    }
+  };
+})();
+
+// ═══ PROXY ENGINE ════════════════════════════════════════════════════════════
+const PROXY = (() => {
+
+  // Timed fetch with circuit breaker integration
+  async function tf(url, opts = {}, timeoutMs = 12000) {
+    const domain = (() => { try { return new URL(url).hostname; } catch { return url; } })();
+    if (CB.isOpen(domain)) throw Object.assign(new Error('CIRCUIT_OPEN'), { domain });
+
+    const ctrl = new AbortController();
+    const tid = setTimeout(() => ctrl.abort(), timeoutMs);
+    try {
+      const r = await fetch(url, { ...opts, signal: ctrl.signal });
+      clearTimeout(tid);
+      CB.ok(domain);
+      return r;
+    } catch (e) {
+      clearTimeout(tid);
+      if (e.name !== 'AbortError') CB.fail(domain);
+      throw e;
+    }
+  }
+
+  // Safe JSON parse
+  async function jSON(r) { try { return await r.json(); } catch { return null; } }
+
+  // Update proxy progress UI
+  function setProxy(i, state, label) {
+    try {
+      const steps = document.querySelectorAll('.proxy-step');
+      if (steps[i]) { steps[i].className = 'proxy-step ' + state; steps[i].textContent = label; }
+    } catch (_) {}
+  }
+
+  // ─── USERNAME RESOLUTION — 8 methods ───────────────────────────────────────
+  async function resolveUser(username) {
+    // Deduplicate concurrent calls for same username
+    if (S.inflightUser && S.inflightUser.username === username) return S.inflightUser.promise;
+    const n = username.trim();
+    if (!n) throw new Error('USER_NOT_FOUND');
+
+    const body = JSON.stringify({ usernames: [n], excludeBannedUsers: false });
+    const jh = { 'Content-Type': 'application/json', 'Accept': 'application/json' };
+    const xh = { ...jh, 'x-requested-with': 'XMLHttpRequest' };
+
+    function parseV1(d) {
+      if (!d) return null;
+      if (d.errors) return null;
+      if (!Array.isArray(d.data)) return null;
+      if (d.data.length === 0) throw new Error('USER_NOT_FOUND');
+      const u = d.data[0];
+      return { id: u.id, name: u.name, display: u.displayName || u.name };
+    }
+    function parseOld(d) {
+      if (!d) return null;
+      if (d.errorCode === 5 || d.success === false || (d.message && d.message.toLowerCase().includes('not found'))) throw new Error('USER_NOT_FOUND');
+      if (!d.Id) return null;
+      return { id: d.Id, name: d.Username, display: d.Username };
+    }
+
+    const METHODS = [
+      // ① roproxy POST
+      { label: '① roproxy.com (POST)', fn: async () => {
+        const r = await tf('https://users.roproxy.com/v1/usernames/users', { method:'POST', headers:jh, body }, 10000);
+        if (!r.ok && r.status === 404) { const d = await jSON(r); if (d?.data?.length===0) throw new Error('USER_NOT_FOUND'); }
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        return parseV1(await jSON(r));
+      }},
+      // ② corsproxy.io no-encode POST
+      { label: '② corsproxy.io (POST)', fn: async () => {
+        const r = await tf('https://corsproxy.io/?https://users.roblox.com/v1/usernames/users', { method:'POST', headers:xh, body }, 11000);
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        return parseV1(await jSON(r));
+      }},
+      // ③ corsproxy.io encoded POST
+      { label: '③ corsproxy.io (encoded)', fn: async () => {
+        const t = encodeURIComponent('https://users.roblox.com/v1/usernames/users');
+        const r = await tf(`https://corsproxy.io/?url=${t}`, { method:'POST', headers:xh, body }, 11000);
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        return parseV1(await jSON(r));
+      }},
+      // ④ allorigins GET (legacy Roblox API)
+      { label: '④ allorigins (GET)', fn: async () => {
+        const target = `https://api.roblox.com/users/get-by-username?username=${encodeURIComponent(n)}`;
+        const r = await tf(`https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`, {}, 10000);
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        return parseOld(await jSON(r));
+      }},
+      // ⑤ thingproxy GET
+      { label: '⑤ thingproxy (GET)', fn: async () => {
+        const target = `https://api.roblox.com/users/get-by-username?username=${encodeURIComponent(n)}`;
+        const r = await tf(`https://thingproxy.freeboard.io/fetch/${target}`, {}, 10000);
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        return parseOld(await jSON(r));
+      }},
+      // ⑥ allorigins with v1 POST via get trick (wrap as GET body)
+      { label: '⑥ allorigins (v1 GET)', fn: async () => {
+        // Allorigins GET wrapper on a GET-friendly endpoint
+        const target = `https://users.roblox.com/v1/users/${encodeURIComponent(n)}`;
+        const r = await tf(`https://api.allorigins.win/raw?url=${encodeURIComponent(target)}`, {}, 10000);
+        if (!r.ok) { if (r.status === 404) throw new Error('USER_NOT_FOUND'); throw new Error('HTTP_' + r.status); }
+        const d = await jSON(r);
+        if (!d?.id) return null;
+        return { id: d.id, name: d.name, display: d.displayName || d.name };
+      }},
+      // ⑦ roproxy GET on username search  
+      { label: '⑦ roproxy (search GET)', fn: async () => {
+        const r = await tf(`https://users.roproxy.com/v1/users/search?keyword=${encodeURIComponent(n)}&limit=10`, {}, 10000);
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        const d = await jSON(r);
+        const u = d?.data?.find(x => x.name?.toLowerCase() === n.toLowerCase());
+        if (!u) return null;
+        return { id: u.id, name: u.name, display: u.displayName || u.name };
+      }},
+      // ⑧ direct attempt (works if site is served with relaxed CORS)
+      { label: '⑧ direct (CORS attempt)', fn: async () => {
+        const r = await tf('https://users.roblox.com/v1/usernames/users', { method:'POST', headers:jh, body, mode:'cors' }, 9000);
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        return parseV1(await jSON(r));
+      }},
+    ];
+
+    let lastErr = new Error('PROXY_UNAVAILABLE');
+    const promise = (async () => {
+      for (let i = 0; i < METHODS.length; i++) {
+        const m = METHODS[i];
+        setProxy(i, 'active', m.label + ' …');
+        try {
+          const result = await m.fn();
+          if (result) { setProxy(i, 'ok', m.label + ' ✓'); return result; }
+          setProxy(i, 'fail', m.label + ' (no data)');
+        } catch (e) {
+          if (e.message === 'USER_NOT_FOUND') { setProxy(i, 'fail', m.label + ' (user not found)'); throw e; }
+          if (e.message === 'CIRCUIT_OPEN') { setProxy(i, 'fail', m.label + ' (circuit open — skip)'); lastErr = e; continue; }
+          setProxy(i, 'fail', m.label + ' ✕ ' + (e.message || ''));
+          lastErr = e;
+        }
+      }
+      throw lastErr;
+    })();
+
+    S.inflightUser = { username: n, promise };
+    promise.finally(() => { if (S.inflightUser?.username === n) S.inflightUser = null; });
+    return promise;
+  }
+
+  // ─── GAMEPASS CHECK — 8 methods ─────────────────────────────────────────────
+  async function checkGP(userId, plan) {
+    const gpId = GP[plan];
+    const invPath = `/v1/users/${userId}/items/GamePass/${gpId}`;
+
+    function parseInv(d) {
+      if (!d) return null;
+      if (Array.isArray(d.data)) return d.data.length > 0;
+      return null;
+    }
+
+    const METHODS = [
+      // ① roproxy inventory
+      { label: '① roproxy inventory', fn: async () => {
+        const r = await tf(`https://inventory.roproxy.com${invPath}`, {}, 10000);
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        return parseInv(await jSON(r));
+      }},
+      // ② corsproxy.io no-encode
+      { label: '② corsproxy (no-enc)', fn: async () => {
+        const r = await tf(`https://corsproxy.io/?https://inventory.roblox.com${invPath}`, {}, 11000);
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        return parseInv(await jSON(r));
+      }},
+      // ③ corsproxy.io encoded
+      { label: '③ corsproxy (encoded)', fn: async () => {
+        const t = encodeURIComponent(`https://inventory.roblox.com${invPath}`);
+        const r = await tf(`https://corsproxy.io/?url=${t}`, {}, 11000);
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        return parseInv(await jSON(r));
+      }},
+      // ④ allorigins raw
+      { label: '④ allorigins (raw)', fn: async () => {
+        const t = encodeURIComponent(`https://inventory.roblox.com${invPath}`);
+        const r = await tf(`https://api.allorigins.win/raw?url=${t}`, {}, 10000);
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        return parseInv(await jSON(r));
+      }},
+      // ⑤ allorigins get (wrapped JSON)
+      { label: '⑤ allorigins (wrapped)', fn: async () => {
+        const t = encodeURIComponent(`https://inventory.roblox.com${invPath}`);
+        const r = await tf(`https://api.allorigins.win/get?url=${t}`, {}, 10000);
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        const wrapper = await jSON(r);
+        if (!wrapper?.contents) return null;
+        return parseInv(JSON.parse(wrapper.contents));
+      }},
+      // ⑥ thingproxy
+      { label: '⑥ thingproxy', fn: async () => {
+        const r = await tf(`https://thingproxy.freeboard.io/fetch/https://inventory.roblox.com${invPath}`, {}, 10000);
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        return parseInv(await jSON(r));
+      }},
+      // ⑦ roproxy with alternate new endpoint
+      { label: '⑦ roproxy (new endpoint)', fn: async () => {
+        const r = await tf(`https://apis.roproxy.com/game-passes/v1/users/${userId}/game-passes`, {}, 10000);
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        const d = await jSON(r);
+        if (!d) return null;
+        const items = d.gamePassProductItems || d.data || [];
+        return items.some(gp => Number(gp.gamePassId) === gpId || Number(gp.id) === gpId);
+      }},
+      // ⑧ direct
+      { label: '⑧ direct (CORS attempt)', fn: async () => {
+        const r = await tf(`https://inventory.roblox.com${invPath}`, { mode: 'cors' }, 9000);
+        if (!r.ok) throw new Error('HTTP_' + r.status);
+        return parseInv(await jSON(r));
+      }},
+    ];
+
+    let lastErr = new Error('INVENTORY_CHECK_FAILED');
+    for (let i = 0; i < METHODS.length; i++) {
+      const m = METHODS[i];
+      setProxy(i, 'active', m.label + ' …');
+      try {
+        const result = await m.fn();
+        if (result !== null) { setProxy(i, 'ok', m.label + ' ✓'); return result; }
+        setProxy(i, 'fail', m.label + ' (null)');
+      } catch (e) {
+        if (e.message === 'CIRCUIT_OPEN') { setProxy(i, 'fail', m.label + ' (skip)'); lastErr = e; continue; }
+        setProxy(i, 'fail', m.label + ' ✕');
+        lastErr = e;
+      }
+    }
+    throw lastErr;
+  }
+
+  // ─── AVATAR ──────────────────────────────────────────────────────────────────
+  async function fetchAvatar(userId) {
+    const path = `/v1/users/avatar-headshot?userIds=${userId}&size=100x100&format=Png&isCircular=false`;
+    const sources = [
+      `https://thumbnails.roproxy.com${path}`,
+      `https://corsproxy.io/?https://thumbnails.roblox.com${path}`,
+      `https://api.allorigins.win/raw?url=${encodeURIComponent('https://thumbnails.roblox.com'+path)}`,
+      `https://thingproxy.freeboard.io/fetch/https://thumbnails.roblox.com${path}`
+    ];
+    for (const src of sources) {
+      try {
+        const r = await tf(src, {}, 7000);
+        if (!r.ok) continue;
+        const d = await jSON(r);
+        const img = d?.data?.[0]?.imageUrl;
+        if (img) return img;
+      } catch (_) {}
+    }
+    return null;
+  }
+
+  // ─── IP DETECTION ─────────────────────────────────────────────────────────────
+  async function getIP() {
+    const sources = [
+      'https://api.ipify.org?format=json',
+      'https://api.ip.sb/jsonip',
+      'https://ipapi.co/json/',
+      'https://api.my-ip.io/ip.json'
+    ];
+    for (const src of sources) {
+      try {
+        const r = await tf(src, {}, 6000);
+        if (!r.ok) continue;
+        const d = await jSON(r);
+        const ip = d?.ip || d?.IP || d?.query;
+        if (ip && /[\d.:a-f]+/.test(ip)) return ip;
+      } catch (_) {}
+    }
+    return 'unknown-' + SESSION.sig.slice(0, 6);
+  }
+
+  return { resolveUser, checkGP, fetchAvatar, getIP };
+})();
+
+// ═══ UI LAYER ════════════════════════════════════════════════════════════════
+const UI = (() => {
+
+  // Safe DOM getter — returns null if not found (no throw)
+  function $(id) { try { return document.getElementById(id); } catch { return null; } }
+  function $$(sel) { try { return [...document.querySelectorAll(sel)]; } catch { return []; } }
+
+  // ─── NETWORK BANNER ─────────────────────────────────────────────────────────
+  function setNetBanner(type, msg) {
+    const el = $('net-banner');
+    if (!el) return;
+    el.className = 'show ' + type;
+    el.textContent = msg;
+    if (type === 'online') setTimeout(() => { el.className = ''; }, 3500);
+  }
+
+  // ─── NETWORK DETECTION ──────────────────────────────────────────────────────
+  window.addEventListener('online',  () => { S.online = true;  setNetBanner('online',  '✓ Back online — you can verify again'); });
+  window.addEventListener('offline', () => { S.online = false; setNetBanner('offline', '⚠ You are offline — verification requires internet'); });
+
+  // ─── STATUS MESSAGES ────────────────────────────────────────────────────────
+  function setStatus(id, type, msg, detail, canRetry, retryFn) {
+    const el = $(id);
+    if (!el) return;
+    el.className = 'sm show ' + type;
+    const lines = [msg];
+    if (detail) lines.push(`<span class="sm-detail">${safeEsc(detail)}</span>`);
+    if (canRetry && retryFn) {
+      lines.push(`<button class="retry-btn" onclick="(${retryFn.toString()})()" >↻ Retry</button>`);
+    }
+    el.innerHTML = lines.join('');
+    // Show rate-limit countdown if applicable
+    const rlEl = $(id.replace('-status', '-rl'));
+    if (rlEl) rlEl.className = 'rl-countdown';
+  }
+
+  function clearStatus(id) { const el = $(id); if (el) { el.className = 'sm'; el.innerHTML = ''; } }
+
+  function showRLCountdown(statusId, ms) {
+    const el = $(statusId);
+    if (!el) return;
+    const rlId = statusId + '-rl';
+    let existing = $(rlId);
+    if (!existing) {
+      existing = document.createElement('div');
+      existing.id = rlId;
+      existing.className = 'rl-countdown';
+      el.parentNode?.insertBefore(existing, el.nextSibling);
+    }
+    let secs = Math.ceil(ms / 1000);
+    existing.className = 'rl-countdown show';
+    const tick = () => {
+      existing.textContent = `⏳ Rate limit — try again in ${secs}s`;
+      if (secs-- > 0) setTimeout(tick, 1000);
+      else { existing.className = 'rl-countdown'; clearStatus(statusId); }
+    };
+    tick();
+  }
+
+  // ─── BUTTON STATE ───────────────────────────────────────────────────────────
+  function setBtn(plan, busy, label) {
+    const id = plan === 'free' ? 'free-btn' : plan + '-btn';
+    const b = $(id);
+    if (!b) return;
+    b.disabled = busy;
+    if (label) { b.textContent = label; return; }
+    const labels = { free: 'Start 1-Hour Free Trial', normal: 'Verify Ownership & Get Key', premium: 'Verify Ownership & Get Key' };
+    b.textContent = busy ? (b.dataset.busyLabel || 'Please wait…') : (labels[plan] || 'Verify');
+    b.style.opacity = busy ? '.65' : '';
+  }
+
+  // ─── INPUT VALIDATION VISUAL ─────────────────────────────────────────────────
+  function setInputState(plan, state) {
+    const wrap = $$(`.iw`).find(w => w.querySelector(`#${plan}-input`));
+    if (!wrap) return;
+    wrap.classList.remove('has-error', 'has-ok');
+    if (state) wrap.classList.add(state);
+  }
+
+  // ─── AUTH MODAL MESSAGE ──────────────────────────────────────────────────────
+  function setAuthMsg(msg) { const e = $('auth-msg'); if (e) e.textContent = msg; }
+
+  // ─── OVERLAY ─────────────────────────────────────────────────────────────────
+  function openOv(id) { const e = $(id); if (e) e.classList.add('open'); }
+  function closeOv(id) { const e = $(id); if (e) e.classList.remove('open'); }
+  function closeAllOv() { $$('.ov.open').forEach(e => e.classList.remove('open')); }
+
+  // ─── GLOBAL ERROR ────────────────────────────────────────────────────────────
+  function globalError(code, msg, detail) {
+    // Don't show for network errors during normal operation
+    if (code === 'ASYNC_ERROR' && (msg.includes('fetch') || msg.includes('network') || msg.includes('abort'))) return;
+    if (code === 'ASYNC_ERROR' && msg.includes('USER_NOT_FOUND')) return;
+    const ov = $('err-overlay');
+    if (!ov || ov.classList.contains('open')) return;
+    const em = $('err-title'); if (em) em.textContent = 'Unexpected Error';
+    const emsg = $('err-msg'); if (emsg) emsg.textContent = msg || 'Something went wrong. Please refresh the page.';
+    const ec = $('err-code'); if (ec) ec.textContent = `Code: ${code}${detail ? ' · ' + detail.slice(0, 60) : ''}`;
+    ov.classList.add('open');
+  }
+
+  // ─── SKELETON LOADING IN CONFIRM MODAL ───────────────────────────────────────
+  function showConfirmSkeleton() {
+    const av = $('conf-av'); if (av) { av.src = ''; av.style.visibility = 'hidden'; }
+    const nm = $('conf-name'); if (nm) nm.innerHTML = '<div class="skel skel-line w80"></div>';
+    const ci = $('conf-id'); if (ci) ci.innerHTML = '<div class="skel skel-line w60"></div>';
+    const gp = $('conf-gp'); if (gp) gp.innerHTML = '<div class="skel skel-line w40"></div>';
+  }
+
+  function fillConfirm(u, plan, av) {
+    const fallback = `data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='72' height='72'><rect width='72' height='72' fill='%2316161e'/><text x='50%' y='62%' text-anchor='middle' fill='%233a3a50' font-size='28' font-family='system-ui'>?</text></svg>`;
+    const avEl = $('conf-av');
+    if (avEl) {
+      avEl.style.visibility = '';
+      avEl.onerror = () => { avEl.src = fallback; avEl.onerror = null; };
+      avEl.src = av || fallback;
+    }
+    const nm = $('conf-name'); if (nm) nm.textContent = safeEsc(u.display || u.name);
+    const ci = $('conf-id');   if (ci) ci.textContent = `@${safeEsc(u.name)} · User ID: ${safeEsc(String(u.id))}`;
+    const lbl = plan === 'normal' ? 'DoorX Normal (1,000 R$)' : 'DoorX Premium (2,500 R$)';
+    const gp = $('conf-gp');  if (gp) gp.textContent = `${lbl} gamepass verified ✓`;
+    const cb = $('conf-btn'); if (cb) { cb.disabled = false; cb.textContent = 'Generate My Key →'; }
+  }
+
+  // ─── KEY MODAL ───────────────────────────────────────────────────────────────
+  function showKey({ key, plan, ip, name }) {
+    const em   = { free: '🎉', normal: '🔑', premium: '👑' }[plan] || '🎉';
+    const wt   = { free: 'TRIAL ACTIVATED', normal: 'KEY ACTIVATED', premium: 'VIP KEY ACTIVATED' }[plan];
+    const ws   = { free: '60-minute trial · Locked to your IP · One-time use', normal: 'Lifetime access · Locked to your Roblox account', premium: 'Lifetime VIP access · Locked to your Roblox account' }[plan];
+
+    const emo = $('k-emoji'); if (emo) emo.textContent = em;
+    const wte = $('k-win');   if (wte) wte.textContent = wt;
+    const wse = $('k-sub');   if (wse) wse.textContent = ws;
+    const kv  = $('k-val');   if (kv)  kv.textContent  = key;
+
+    const card = $('k-card');
+    if (card) card.className = 'kc' + (plan === 'free' ? ' kf' : plan === 'premium' ? ' kpr' : '');
+
+    let meta = '';
+    if (plan === 'free' && ip) meta = `IP: ${safeEsc(ip)}  ·  Expires: 60 min from now`;
+    else if (name) meta = `Locked to: @${safeEsc(name)}  ·  Never expires`;
+    const km = $('k-meta'); if (km) km.textContent = meta;
+
+    openOv('ov-key');
+    confetti(plan);
+  }
+
+  // ─── COPY KEY ───────────────────────────────────────────────────────────────
+  function copyKey() {
+    const kv = $('k-val'); if (!kv) return;
+    const key = kv.textContent;
+    const btn = $('copy-btn');
+
+    const success = () => {
+      if (!btn) return;
+      const o = btn.textContent;
+      btn.textContent = '✓ Copied to Clipboard!';
+      btn.style.background = 'var(--green)'; btn.style.color = '#000';
+      setTimeout(() => { btn.textContent = o; btn.style.background = ''; btn.style.color = ''; }, 2500);
+    };
+
+    // Method 1: Clipboard API
+    if (navigator.clipboard?.writeText) {
+      navigator.clipboard.writeText(key).then(success).catch(() => legacyCopy(key, success));
+    } else {
+      legacyCopy(key, success);
+    }
+  }
+
+  function legacyCopy(text, cb) {
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text; ta.style.cssText = 'position:fixed;left:-9999px;top:-9999px;opacity:0;';
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      document.execCommand('copy'); document.body.removeChild(ta); cb();
+    } catch { cb(); /* still call cb — user sees "copied" even if it might have failed */ }
+  }
+
+  // ─── CONFETTI ────────────────────────────────────────────────────────────────
+  function confetti(plan) {
+    const clrs = { free: ['#00f5a0','#00cc7e','#fff'], normal: ['#ff7091','#e63950','#ffaabc'], premium: ['#ffc14a','#ff9f5a','#fff0c0'] }[plan] || ['#e63950'];
+    try {
+      for (let i = 0; i < 90; i++) {
+        const d = document.createElement('div');
+        const sz = Math.random() * 9 + 4;
+        const clr = clrs[i % clrs.length];
+        d.style.cssText = `position:fixed;left:${Math.random()*100}vw;top:-${sz}px;width:${sz}px;height:${sz}px;background:${clr};z-index:999999;border-radius:${Math.random() > .5 ? '50%' : '3px'};pointer-events:none;will-change:transform;`;
+        document.body.appendChild(d);
+        const dur = Math.random() * 2200 + 1800;
+        const a = d.animate([
+          { transform: `translateY(0) rotate(0deg)`, opacity: 1 },
+          { transform: `translateY(${window.innerHeight + 80}px) rotate(${Math.random()*720-360}deg)`, opacity: 0 }
+        ], { duration: dur, easing: 'ease-in', delay: Math.random() * 400 });
+        a.onfinish = () => { try { d.remove(); } catch {} };
+        setTimeout(() => { try { if (document.body.contains(d)) d.remove(); } catch {} }, dur + 600);
+      }
+    } catch {
+      // CSS-only fallback confetti
+      for (let i = 0; i < 20; i++) {
+        const d = document.createElement('div');
+        d.className = 'cf-piece';
+        const clr = clrs[i % clrs.length];
+        d.style.cssText = `position:fixed;left:${Math.random()*100}vw;top:0;width:8px;height:8px;background:${clr};z-index:999999;border-radius:50%;pointer-events:none;animation-duration:${Math.random()*2+2}s;animation-delay:${Math.random()*.5}s;`;
+        document.body.appendChild(d);
+        setTimeout(() => { try { d.remove(); } catch {} }, 3000);
+      }
+    }
+  }
+
+  // ─── TAB NAVIGATION ──────────────────────────────────────────────────────────
+  function goTab(name) {
+    try {
+      $$('.nb').forEach(b => b.classList.remove('on','free-on'));
+      const b = document.querySelector(`[data-tab="${name}"]`);
+      if (b) b.classList.add(name === 'free' ? 'free-on' : 'on');
+      $$('.tab').forEach(t => t.classList.remove('show'));
+      const t = $('tab-' + name);
+      if (t) t.classList.add('show');
+      try { window.scrollTo({ top: 0, behavior: 'smooth' }); } catch { window.scrollTo(0, 0); }
+    } catch (e) { console.warn('[DoorX] goTab error:', e); }
+  }
+
+  // ─── FAQ ──────────────────────────────────────────────────────────────────────
+  function faq(el) { try { el.closest('.fi').classList.toggle('open'); } catch {} }
+
+  // ─── PROXY STEPS HTML (inject into auth modal) ───────────────────────────────
+  function initProxySteps() {
+    const el = $('proxy-steps');
+    if (!el) return;
+    el.innerHTML = Array.from({length:8}, (_,i) => `<div class="proxy-step" id="pstep-${i}">Method ${i+1}</div>`).join('');
+  }
+
+  function resetProxySteps() {
+    for (let i = 0; i < 8; i++) {
+      const el = $('pstep-'+i);
+      if (el) { el.className = 'proxy-step'; el.textContent = `Method ${i+1}`; }
+    }
+  }
+
+  return { $, $$, setStatus, clearStatus, showRLCountdown, setBtn, setInputState, setAuthMsg, openOv, closeOv, closeAllOv, globalError, showConfirmSkeleton, fillConfirm, showKey, copyKey, confetti, goTab, faq, initProxySteps, resetProxySteps };
+})();
+
+// ═══ VERIFICATION FLOW ═══════════════════════════════════════════════════════
+function safeEsc(s) { try { return String(s).replace(/[<>&"']/g, c => ({'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;',"'":'&#39;'}[c])); } catch { return ''; } }
+
+async function startFree() {
+  if (!RL.ok('free')) {
+    const wait = RL.waitMs('free');
+    UI.setStatus('free-status', 's-err', '⚠ Too many attempts.', `Please wait before trying again.`);
+    if (wait > 0) UI.showRLCountdown('free-status', wait);
+    return;
+  }
+  if (!S.online) { UI.setStatus('free-status', 's-err', '⚠ You are offline.', 'Connect to the internet and try again.'); return; }
+  RL.hit('free');
+  UI.setBtn('free', true, 'Activating…');
+  UI.setStatus('free-status', 's-info', '⟳ Detecting your IP address…');
+
+  try {
+    const ip = await PROXY.getIP();
+    UI.setStatus('free-status', 's-info', '⟳ Generating cryptographic key…');
+    const key = await KEYGEN.genFree(ip);
+    await STORE.save('free', key);
+    S.pendingKey = { key, plan: 'free', ip };
+    UI.clearStatus('free-status');
+    UI.showKey({ key, plan: 'free', ip, name: null });
+  } catch (e) {
+    const detail = `Error: ${e.message || 'unknown'} · Session: ${SESSION.id.slice(0,8)}`;
+    UI.setStatus('free-status', 's-err', '✕ Could not activate trial.', detail, true, () => startFree());
+  } finally {
+    UI.setBtn('free', false);
+  }
+}
+
+async function verify(plan) {
+  if (S.verifying) return;
+
+  if (!S.online) { UI.setStatus(plan+'-status', 's-err', '⚠ You are offline.', 'Connect to the internet first.'); return; }
+
+  if (!RL.ok(plan)) {
+    const wait = RL.waitMs(plan);
+    UI.setStatus(plan+'-status', 's-err', '⚠ Too many attempts.', `Rate limited — ${Math.ceil(wait/1000)}s remaining`);
+    if (wait > 0) UI.showRLCountdown(plan+'-status', wait);
+    return;
+  }
+
+  const inp = UI.$(`${plan}-input`);
+  const username = (inp?.value || '').trim();
+
+  // Input validation
+  if (!username) { UI.setInputState(plan,'has-error'); UI.setStatus(plan+'-status','s-err','✕ Please enter your Roblox username.'); inp?.focus(); return; }
+  if (username.length < 3) { UI.setInputState(plan,'has-error'); UI.setStatus(plan+'-status','s-err','✕ Username is too short (minimum 3 characters).'); return; }
+  if (username.length > 20) { UI.setInputState(plan,'has-error'); UI.setStatus(plan+'-status','s-err','✕ Username is too long (maximum 20 characters).'); return; }
+  if (!/^[a-zA-Z0-9_]+$/.test(username)) { UI.setInputState(plan,'has-error'); UI.setStatus(plan+'-status','s-err','✕ Invalid username — only letters, numbers and underscores allowed.'); return; }
+
+  UI.setInputState(plan, null);
+  S.verifying = true; S.plan = plan;
+  RL.hit(plan);
+  UI.setBtn(plan, true, 'Verifying…');
+  UI.clearStatus(plan+'-status');
+  UI.initProxySteps();
+  UI.resetProxySteps();
+  UI.openOv('ov-auth');
+  UI.setAuthMsg('Resolving Roblox username…');
+
+  try {
+    // STEP 1 — resolve username → userId
+    const u = await PROXY.resolveUser(username);
+    S.user = u;
+    UI.setAuthMsg(`Found @${safeEsc(u.name)} (ID: ${safeEsc(String(u.id))}) — checking gamepass inventory…`);
+    UI.resetProxySteps();
+
+    // STEP 2 — check gamepass ownership
+    const owned = await PROXY.checkGP(u.id, plan);
+
+    if (!owned) {
+      UI.closeOv('ov-auth');
+      S.verifying = false; UI.setBtn(plan, false);
+      UI.setInputState(plan, 'has-error');
+      const gpName = plan === 'normal' ? 'DoorX Normal' : 'DoorX Premium';
+      UI.setStatus(plan+'-status', 's-err',
+        `✕ "${gpName}" gamepass not found in @${safeEsc(u.name)}'s inventory.`,
+        'Purchase the gamepass on Roblox first, then come back and verify.',
+        false
+      );
+      return;
+    }
+
+    UI.setInputState(plan, 'has-ok');
+    UI.setAuthMsg('Gamepass confirmed ✓ — loading profile…');
+
+    // STEP 3 — fetch avatar (non-critical — failure is fine)
+    const av = await PROXY.fetchAvatar(u.id).catch(() => null);
+
+    UI.closeOv('ov-auth');
+    UI.showConfirmSkeleton();
+    UI.openOv('ov-conf');
+    // Small delay to show skeleton, then fill real data
+    setTimeout(() => { try { UI.fillConfirm(u, plan, av); } catch (fillErr) { console.warn('[DoorX] fillConfirm error:', fillErr); UI.fillConfirm(u, plan, null); } }, 300);
+
+  } catch (e) {
+    UI.closeOv('ov-auth');
+    S.verifying = false; UI.setBtn(plan, false);
+    UI.setInputState(plan, 'has-error');
+
+    const em = e?.message || '';
+    const detail = `Code: ${em || 'UNKNOWN'} · Session: ${SESSION.id.slice(0,8)}`;
+    let msg = '✕ Verification failed. Please try again.';
+
+    if (em === 'USER_NOT_FOUND')
+      msg = `✕ "${safeEsc(username)}" was not found on Roblox. Double-check the spelling.`;
+    else if (em === 'RATE_LIMIT')
+      msg = '✕ Roblox is rate-limiting requests. Wait 30 seconds and try again.';
+    else if (em === 'INVENTORY_CHECK_FAILED')
+      msg = '✕ Could not reach the Roblox inventory API. Try again in a moment.';
+    else if (em === 'PROXY_UNAVAILABLE' || em === 'CIRCUIT_OPEN')
+      msg = '✕ All API proxies are temporarily unreachable. Check your internet or try again shortly.';
+    else if (em.startsWith('HTTP_4'))
+      msg = `✕ Roblox returned an error. Check the username and try again.`;
+    else if (em.startsWith('HTTP_5'))
+      msg = '✕ Roblox servers are having issues. Please wait a moment and try again.';
+    else if (e.name === 'AbortError' || em.includes('abort'))
+      msg = '✕ Request timed out. Check your connection and retry.';
+    else if (em.includes('Failed to fetch') || em.includes('NetworkError') || em.includes('network'))
+      msg = '✕ Network error. Check your internet connection and retry.';
+
+    console.error('[DoorX verify]', em, e);
+    UI.setStatus(plan+'-status', 's-err', msg, detail, true, () => verify(plan));
+  }
+}
+
+async function doGen() {
+  const { plan, user } = S;
+  if (!plan || !user) { UI.closeOv('ov-conf'); cancelV(); return; }
+
+  const cb = UI.$('conf-btn');
+  if (cb) { cb.disabled = true; cb.textContent = 'Generating…'; }
+
+  try {
+    const key = await KEYGEN.gen(plan, user.id);
+    const saved = await STORE.save(plan, key);
+    if (!saved) console.warn('[DoorX] Key could not be saved to any storage tier');
+
+    S.pendingKey = { key, plan, userId: user.id, name: user.name };
+    UI.closeOv('ov-conf');
+    UI.setBtn(plan, false);
+    UI.setInputState(plan, 'has-ok');
+    UI.setStatus(plan+'-status', 's-ok', `✓ ${plan.charAt(0).toUpperCase()+plan.slice(1)} key generated and secured.`);
+    UI.showKey(S.pendingKey);
+    S.verifying = false;
+  } catch (e) {
+    console.error('[DoorX doGen]', e);
+    if (cb) { cb.disabled = false; cb.textContent = 'Generate My Key →'; }
+    UI.closeOv('ov-conf');
+    UI.setStatus(plan+'-status', 's-err', '✕ Key generation failed.', e.message, true, () => doGen());
+    S.verifying = false;
+    UI.setBtn(plan, false);
+  }
+}
+
+function cancelV() {
+  S.verifying = false;
+  if (S.plan) UI.setBtn(S.plan, false);
+  UI.closeAllOv();
+}
+
+// ═══ PROGRAM FETCH PROTECTION ════════════════════════════════════════════════
+const LOCK_LOG = [];
+window.addEventListener('message', async (ev) => {
+  try {
+    const m = ev.data;
+    if (!m || typeof m !== 'object' || m.type !== 'doorx_fetch_key') return;
+    // Log all attempts
+    LOCK_LOG.push({ ts: Date.now(), origin: ev.origin, program: m.program, hasKey: !!m.key, hasSig: !!m.sig });
+    // Validate
+    if (m.program !== 'DoorX' || !m.key || !m.sig) { lockdown(`INVALID_PROGRAM:${m.program||'?'}`); return; }
+    if (LOCK_LOG.filter(l => Date.now() - l.ts < 60000).length > 10) { lockdown('FLOOD_ATTEMPT'); return; }
+    const r = await STORE.validate(m.key, m.sig);
+    if (r?.ok) ev.source?.postMessage({ type: 'doorx_ok', plan: r.plan }, '*');
+    else ev.source?.postMessage({ type: 'doorx_denied', code: 'INVALID_KEY' }, '*');
+  } catch (e) {
+    console.error('[DoorX message handler]', e);
+  }
+});
+
+function lockdown(reason) {
+  if (S.ldActive) return;
+  S.ldActive = true;
+  S.pendingKey = null; S.user = null;
+  // Wipe RAM store
+  try { /* STORE RAM already GC'd when window closes */ } catch {}
+  const ld = UI.$('ld');
+  if (ld) ld.classList.add('on');
+  const reasonEl = document.createElement('p');
+  reasonEl.style.cssText = 'font-family:var(--mono);font-size:.75rem;color:var(--dim);margin-top:8px;';
+  reasonEl.textContent = `Reason: ${reason || 'UNAUTHORIZED'} · Session: ${SESSION.id.slice(0,8)}`;
+  if (ld) ld.appendChild(reasonEl);
+  let secs = 3600;
+  const el = UI.$('ld-t');
+  const iv = setInterval(() => {
+    if (!el) return;
+    el.textContent = `${String(Math.floor(secs/60)).padStart(2,'0')}:${String(secs%60).padStart(2,'0')}`;
+    if (--secs <= 0) { clearInterval(iv); if (ld) ld.classList.remove('on'); S.ldActive = false; }
+  }, 1000);
+}
+
+// ═══ FONT FALLBACK ═══════════════════════════════════════════════════════════
+(function() {
+  const timeout = setTimeout(() => {
+    // If Google Fonts didn't load in 3s, apply system font fallback
+    const testEl = document.createElement('span');
+    testEl.style.cssText = 'font-family:"Bebas Neue";position:fixed;visibility:hidden;font-size:72px;';
+    testEl.textContent = 'DX';
+    document.body.appendChild(testEl);
+    const w = testEl.offsetWidth;
+    document.body.removeChild(testEl);
+    // If width matches fallback serif width, fonts didn't load
+    if (w === 0 || w > 140) document.body.classList.add('font-fallback');
+  }, 3000);
+
+  if (document.fonts?.ready) {
+    document.fonts.ready.then(() => clearTimeout(timeout)).catch(() => {});
+  }
+})();
+
+// ═══ PARTICLES (with Canvas error fallback) ══════════════════════════════════
+(function() {
+  const cv = UI.$('cv');
+  if (!cv) return;
+  try {
+    const cx = cv.getContext('2d');
+    if (!cx) throw new Error('no context');
+    function rsz() { cv.width = innerWidth; cv.height = innerHeight; }
+    window.addEventListener('resize', rsz); rsz();
+    const P = Array.from({length:90}, () => ({
+      x: Math.random()*innerWidth, y: Math.random()*innerHeight,
+      sz: Math.random()*1.6+.3, sp: Math.random()*.45+.15,
+      al: Math.random()*.4+.07, h: Math.random()>.7?340:158
+    }));
+    let raf;
+    function draw() {
+      try {
+        cx.clearRect(0, 0, cv.width, cv.height);
+        P.forEach(p => {
+          p.y -= p.sp; p.al -= .0012;
+          if (p.y < -4 || p.al <= 0) { p.x = Math.random()*innerWidth; p.y = innerHeight+4; p.al = Math.random()*.4+.07; }
+          cx.globalAlpha = p.al;
+          cx.fillStyle = `hsl(${p.h},100%,78%)`;
+          cx.beginPath(); cx.arc(p.x, p.y, p.sz, 0, Math.PI*2); cx.fill();
+        });
+        cx.globalAlpha = 1;
+        raf = requestAnimationFrame(draw);
+      } catch { cancelAnimationFrame(raf); cv.style.display = 'none'; }
+    }
+    raf = requestAnimationFrame(draw);
+  } catch {
+    // Canvas not supported — hide it, background gradient takes over
+    cv.style.display = 'none';
+  }
+})();
+
+// ═══ COUNTDOWN + FEED + MISC ════════════════════════════════════════════════
+// Discount countdown
+(function() {
+  const TOTAL = 23*3600 + Math.floor(Math.random()*3599) + 1;
+  let left = TOTAL - (Date.now()/1000 % TOTAL | 0);
+  function tick() {
+    if (left <= 0) left = TOTAL;
+    const h = Math.floor(left/3600), m = Math.floor((left%3600)/60), s = left%60;
+    try {
+      const ph = UI.$('cd-h'), pm = UI.$('cd-m'), ps = UI.$('cd-s');
+      if (ph) ph.textContent = String(h).padStart(2,'0');
+      if (pm) pm.textContent = String(m).padStart(2,'0');
+      if (ps) ps.textContent = String(s).padStart(2,'0');
+    } catch {}
+    left--;
+  }
+  tick(); setInterval(tick, 1000);
+})();
+
+// Activity feed
+const ACTS = ['xXProScripter99 activated Premium · Blox Fruits','BladeBallGod earned 2.1M coins with Normal key','RobuxLegend started a Free Trial session','VortexExec claimed Premium VIP lifetime key','ShadowKing joined — inventory verified','TycoonMaster99 ran infinite-money script','UntitledTester used DoorX Free Trial','NovaScript activated Normal in Adopt Me','PhantomX claimed Premium access today','DriftKing ran Arsenal unlock-all script'];
+let fi = 0;
+function addFeed() {
+  try {
+    const feed = UI.$('feed'); if (!feed) return;
+    const row = document.createElement('div'); row.className = 'fr';
+    const now = new Date();
+    const t = `${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+    row.innerHTML = `<span>${ACTS[fi % ACTS.length]}</span><span class="ft">${t}</span>`;
+    feed.prepend(row);
+    if (feed.children.length > 7) { try { feed.lastChild.remove(); } catch {} }
+    fi++;
+  } catch {}
+}
+for (let i = 0; i < 5; i++) addFeed();
+setInterval(addFeed, 3400);
+
+// Nav setup
+try {
+  UI.$$('.nb').forEach(b => b.addEventListener('click', () => { try { UI.goTab(b.dataset.tab); } catch {} }));
+} catch {}
+
+// Logo onerror
+try {
+  const logo = document.querySelector('.logo-img');
+  if (logo) {
+    logo.onerror = function() {
+      this.onerror = null; this.style.display = 'none';
+      const fb = document.createElement('div'); fb.className = 'logo-fallback'; fb.textContent = '😁';
+      this.parentNode?.insertBefore(fb, this.nextSibling);
+    };
+  }
+} catch {}
+
+// Expose public interface
+return { UI, startFree, verify, doGen, cancelV, lockdown, safeEsc };
+// ─── END NAMESPACE ──────────────────────────────────────────────────────────
+})();
+
+// ─── Global function shims (called from onclick HTML attributes) ─────────────
+function startFree()  { try { DOORX.startFree(); }  catch(e) { console.error(e); } }
+function verify(p)    { try { DOORX.verify(p); }    catch(e) { console.error(e); } }
+function doGen()      { try { DOORX.doGen(); }       catch(e) { console.error(e); } }
+function cancelV()    { try { DOORX.cancelV(); }     catch(e) { console.error(e); } }
+function goTab(t)     { try { DOORX.UI.goTab(t); }   catch(e) { console.error(e); } }
+function faq(el)      { try { DOORX.UI.faq(el); }    catch(e) { console.error(e); } }
+function copyKey()    { try { DOORX.UI.copyKey(); }   catch(e) { console.error(e); } }
+function openOv(id)   { try { DOORX.UI.openOv(id); } catch(e) { console.error(e); } }
+function closeOv(id)  { try { DOORX.UI.closeOv(id); }catch(e) { console.error(e); } }
+
+
+</script>
+</body>
+</html>
