@@ -1,0 +1,14 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "devCommand": "npm run dev",
+  "installCommand": "npm install",
+  "regions": ["iad1"],
+  "env": {
+    "DATABASE_URL": "@doorx-database-url",
+    "DIRECT_URL": "@doorx-direct-url",
+    "INTERNAL_API_SECRET": "@doorx-internal-secret",
+    "IP_HASH_SALT": "@doorx-ip-hash-salt",
+    "ALLOWED_ORIGINS": "@doorx-allowed-origins"
+  }
+}
